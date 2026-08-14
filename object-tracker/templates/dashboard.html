@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — QR Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Page Header -->
+  <div class="page-header flex justify-between items-center">
+    <div>
+      <h1>My Items</h1>
+      <p>Hello, <strong>{{ current_user.username }}</strong> — here are all your tracked objects.</p>
+    </div>
+    <a href="{{ url_for('add_item') }}" class="btn btn-primary">+ Add Item</a>
+  </div>
+
+  <!-- Items Grid -->
+  {% if items %}
+    <div class="grid grid-2">
+      {% for item in items %}
+        {% set loc = latest_locations[item.id] %}
+        <div class="card" style="display:flex; flex-direction:column; gap:1rem;">
+
+          <!-- Top: QR image + item name -->
+          <div class="flex gap-3 items-center">
+            <!-- QR Code image (saved in static/qr_codes/) -->
+            <img
+              src="{{ url_for('static', filename='qr_codes/' ~ item.qr_id.lower() ~ '.png') }}"
+              alt="QR for {{ item.name }}"
+              class="qr-img"
+              onerror="this.style.display='none'"
+            />
+            <div>
+              <div style="font-weight:700; font-size:1.05rem;">{{ item.name }}</div>
+              <span class="tag">{{ item.qr_id }}</span>
+            </div>
+          </div>
+
+          <!-- Last known location -->
+          <div style="background:var(--bg); border-radius:8px; padding:.75rem 1rem;">
+            {% if loc %}
+              <div class="text-muted" style="font-size:.75rem; text-transform:uppercase; letter-spacing:.06em; margin-bottom:.25rem;">Last seen</div>
+              <div style="font-weight:600;">📍 {{ loc.location }}</div>
+              <div class="mono" style="font-size:.75rem; color:var(--muted); margin-top:.2rem;">
+                {{ loc.time.strftime('%b %d, %Y  %I:%M %p') }}
+              </div>
+            {% else %}
+              <div class="text-muted">No location recorded yet.</div>
+            {% endif %}
+          </div>
+
+          <!-- Actions -->
+          <div class="flex gap-2" style="margin-top:auto;">
+            <a href="{{ url_for('item_history', item_id=item.id) }}"
+               class="btn btn-outline btn-sm">History</a>
+
+            <!-- Delete button (sends a POST request) -->
+            <form method="POST" action="{{ url_for('delete_item', item_id=item.id) }}"
+                  onsubmit="return confirm('Delete {{ item.name }}?')"
+                  style="margin-left:auto;">
+              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </div>
+
+        </div>
+      {% endfor %}
+    </div>
+
+  {% else %}
+    <!-- Empty state -->
+    <div class="card" style="text-align:center; padding:3rem;">
+      <div style="font-size:3rem; margin-bottom:1rem;">📦</div>
+      <h2>No items yet</h2>
+      <p class="text-muted" style="margin:.5rem 0 1.5rem;">
+        Add your first item and attach a QR code to it.
+      </p>
+      <a href="{{ url_for('add_item') }}" class="btn btn-primary">+ Add Your First Item</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

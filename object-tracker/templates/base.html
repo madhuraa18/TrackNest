@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}QR Tracker{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ── RESET & ROOT VARIABLES ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0c10;
+      --surface:   #13141a;
+      --border:    #1f2130;
+      --accent:    #00e5ff;
+      --accent2:   #7b2ff7;
+      --danger:    #ff4c6a;
+      --success:   #00e5a0;
+      --warning:   #ffc857;
+      --text:      #e8eaf0;
+      --muted:     #6b7280;
+      --radius:    10px;
+      --font-ui:   'Syne', sans-serif;
+      --font-mono: 'Space Mono', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-ui);
+      min-height: 100vh;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      height: 60px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-brand {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: .03em;
+    }
+    .nav-links { display: flex; gap: 1rem; align-items: center; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-pill {
+      background: var(--accent);
+      color: #000 !important;
+      padding: .35rem .9rem;
+      border-radius: 999px;
+      font-size: .8rem !important;
+    }
+    .nav-pill:hover { opacity: .85; color: #000 !important; }
+
+    /* ── MAIN CONTAINER ── */
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+
+    /* ── FLASH MESSAGES ── */
+    .alerts { margin-bottom: 1.5rem; }
+    .alert {
+      padding: .75rem 1rem;
+      border-radius: var(--radius);
+      margin-bottom: .5rem;
+      font-size: .9rem;
+      border-left: 4px solid;
+    }
+    .alert-success { background: #00e5a01a; border-color: var(--success); color: var(--success); }
+    .alert-danger  { background: #ff4c6a1a; border-color: var(--danger);  color: var(--danger);  }
+    .alert-warning { background: #ffc8571a; border-color: var(--warning); color: var(--warning); }
+    .alert-info    { background: #00e5ff1a; border-color: var(--accent);  color: var(--accent);  }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      transition: border-color .2s;
+    }
+    .card:hover { border-color: #2a2d40; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .6rem 1.3rem;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font-ui);
+      font-weight: 600;
+      font-size: .875rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity .15s, transform .1s;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary  { background: var(--accent);  color: #000; }
+    .btn-danger   { background: var(--danger);  color: #fff; }
+    .btn-outline  { background: transparent; border: 1px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+    .btn:hover { opacity: .88; }
+    .btn-sm { padding: .4rem .9rem; font-size: .8rem; }
+
+    /* ── FORM ELEMENTS ── */
+    .form-group { margin-bottom: 1.25rem; }
+    label { display: block; font-size: .8rem; font-weight: 600; letter-spacing: .06em;
+            text-transform: uppercase; color: var(--muted); margin-bottom: .45rem; }
+    input[type=text], input[type=password], textarea, select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: .7rem 1rem;
+      font-family: var(--font-ui);
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 80px; }
+
+    /* ── AUTH CARD ── */
+    .auth-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 60px);
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.5rem;
+    }
+    .auth-card h1 { font-size: 1.6rem; font-weight: 800; margin-bottom: .4rem; }
+    .auth-card p  { color: var(--muted); font-size: .9rem; margin-bottom: 2rem; }
+
+    /* ── MISC ── */
+    .page-header { margin-bottom: 2rem; }
+    .page-header h1 { font-size: 1.8rem; font-weight: 800; }
+    .page-header p  { color: var(--muted); margin-top: .3rem; }
+    .tag {
+      display: inline-block;
+      padding: .2rem .65rem;
+      border-radius: 999px;
+      font-size: .75rem;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      background: #7b2ff720;
+      color: #a97ff7;
+      border: 1px solid #7b2ff740;
+    }
+    .mono { font-family: var(--font-mono); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+    .text-muted { color: var(--muted); font-size: .85rem; }
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .gap-2 { gap: .5rem; }
+    .gap-3 { gap: .75rem; }
+    .justify-between { justify-content: space-between; }
+    .mt-1 { margin-top: .25rem; }
+    .mt-2 { margin-top: .5rem; }
+    .mt-3 { margin-top: .75rem; }
+    .mt-4 { margin-top: 1rem; }
+    .mb-4 { margin-bottom: 1rem; }
+
+    /* ── QR IMAGE ── */
+    .qr-img {
+      width: 80px; height: 80px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      object-fit: contain;
+      background: #fff;
+      padding: 4px;
+    }
+    .qr-img-lg { width: 160px; height: 160px; }
+
+    /* ── GRID ── */
+    .grid { display: grid; gap: 1rem; }
+    .grid-2 { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+
+    /* ── TIMELINE ── */
+    .timeline { list-style: none; }
+    .timeline li {
+      position: relative;
+      padding: .8rem 1rem .8rem 2rem;
+      border-left: 2px solid var(--border);
+      margin-left: .5rem;
+    }
+    .timeline li::before {
+      content: '';
+      position: absolute;
+      left: -5px;
+      top: 1.05rem;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .timeline li:last-child { border-color: transparent; }
+    .tl-location { font-weight: 600; }
+    .tl-time { color: var(--muted); font-size: .78rem; font-family: var(--font-mono); margin-top: .15rem; }
+
+    /* ── FOUND PAGE ── */
+    .found-hero {
+      text-align: center;
+      padding: 3rem 1rem;
+    }
+    .found-hero .icon { font-size: 4rem; margin-bottom: 1rem; }
+    .found-hero h1 { font-size: 2rem; font-weight: 800; }
+    .found-hero p  { color: var(--muted); margin: .5rem auto 2rem; max-width: 420px; }
+  </style>
+</head>
+<body>
+
+  <!-- ── NAVIGATION ── -->
+  {% if current_user.is_authenticated %}
+  <nav>
+    <a class="nav-brand" href="{{ url_for('dashboard') }}">⬡ QR Tracker</a>
+    <div class="nav-links">
+      <a href="{{ url_for('dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('add_item') }}">+ Add Item</a>
+      <a href="{{ url_for('logout') }}" class="nav-pill">Logout</a>
+    </div>
+  </nav>
+  {% endif %}
+
+  <!-- ── FLASH MESSAGES ── -->
+  <div class="container" style="padding-bottom:0">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="alerts">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- ── PAGE CONTENT ── -->
+  {% block content %}{% endblock %}
+
+</body>
+</html>

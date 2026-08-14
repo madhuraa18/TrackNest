@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}{{ item.name }} History — QR Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <!-- Back link -->
+  <a href="{{ url_for('dashboard') }}"
+     style="color:var(--muted); text-decoration:none; font-size:.85rem;">
+    ← Back to Dashboard
+  </a>
+
+  <!-- Item header -->
+  <div class="flex gap-3 items-center mt-4" style="margin-bottom:2rem;">
+    <img
+      src="{{ url_for('static', filename='qr_codes/' ~ item.qr_id.lower() ~ '.png') }}"
+      alt="QR for {{ item.name }}"
+      class="qr-img qr-img-lg"
+      onerror="this.style.display='none'"
+    />
+    <div>
+      <h1 style="font-size:1.8rem; font-weight:800;">{{ item.name }}</h1>
+      <span class="tag">{{ item.qr_id }}</span>
+      <p class="text-muted mt-2">
+        Print this QR code and attach it to your item.
+        When scanned, it opens a "found item" page.
+      </p>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem;">
+
+    <!-- LEFT: Update location form -->
+    <div class="card">
+      <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">📍 Update Location</h2>
+      <form method="POST" action="{{ url_for('update_location', item_id=item.id) }}">
+        <div class="form-group">
+          <label for="location">Where is it now?</label>
+          <input type="text" id="location" name="location"
+                 placeholder="e.g. Study Table, Kitchen Drawer…"
+                 required autofocus />
+        </div>
+
+        <!-- Quick location buttons -->
+        <div class="text-muted mb-4" style="margin-top:-.5rem; font-size:.82rem;">
+          {% for place in ['Study Table','Bedroom','Kitchen','Car','Backpack','Office'] %}
+            <button type="button"
+                    onclick="document.getElementById('location').value='{{ place }}'"
+                    style="background:var(--border); border:none; color:var(--text);
+                           padding:.2rem .6rem; border-radius:6px; cursor:pointer;
+                           font-size:.78rem; margin:.15rem;">
+              {{ place }}
+            </button>
+          {% endfor %}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-sm">Save Location</button>
+      </form>
+    </div>
+
+    <!-- RIGHT: Location history timeline -->
+    <div class="card">
+      <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">🕐 Location History</h2>
+
+      {% if locations %}
+        <ul class="timeline">
+          {% for loc in locations %}
+            <li>
+              <div class="tl-location">{{ loc.location }}</div>
+              <div class="tl-time">{{ loc.time.strftime('%b %d, %Y  %I:%M %p') }}</div>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">No locations recorded yet.</p>
+      {% endif %}
+    </div>
+
+  </div><!-- end grid -->
+
+  <!-- Found messages (if any) -->
+  {% if found_messages %}
+  <div class="card mt-4" style="border-color:#ffc85740;">
+    <h2 style="font-size:1.1rem; font-weight:700; margin-bottom:1rem;">
+      📬 Messages from finders ({{ found_messages|length }})
+    </h2>
+    {% for msg in found_messages %}
+      <div style="background:var(--bg); border-radius:8px; padding:.75rem 1rem; margin-bottom:.75rem;">
+        <div>{{ msg.message }}</div>
+        <div class="mono text-muted" style="font-size:.75rem; margin-top:.3rem;">
+          {{ msg.time.strftime('%b %d, %Y  %I:%M %p') }}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

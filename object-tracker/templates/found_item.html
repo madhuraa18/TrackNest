@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Found Item — QR Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="found-hero">
+
+    <!-- Icon -->
+    <div class="icon">🔍</div>
+
+    <!-- Heading -->
+    <h1>Found an item?</h1>
+    <p>
+      This item (<strong>{{ item.qr_id }}</strong>) belongs to its registered owner.
+      Please leave a message below so the owner can be notified and retrieve it.
+    </p>
+
+    <!-- Message Form -->
+    <div class="card" style="max-width:500px; margin:0 auto; text-align:left;">
+      <form method="POST">
+        <div class="form-group">
+          <label for="message">Your message to the owner</label>
+          <textarea id="message" name="message"
+                    placeholder="e.g. I found your item at the coffee shop on MG Road. Call me on …"
+                    rows="4" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+          📨 Send Message to Owner
+        </button>
+      </form>
+    </div>
+
+    <!-- Reassurance note -->
+    <p class="text-muted mt-4" style="font-size:.85rem;">
+      Your message is stored privately and only visible to the item's owner.
+    </p>
+
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Register — QR Tracker{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <div style="font-size:2rem; margin-bottom:.75rem;">⬡</div>
+    <h1>Create account</h1>
+    <p>Register to start tracking your belongings.</p>
+
+    <!-- Registration Form -->
+    <form method="POST" action="{{ url_for('register') }}">
+
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username"
+               placeholder="choose_a_username" required autofocus />
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password"
+               placeholder="choose a strong password" required />
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
+        Create Account →
+      </button>
+    </form>
+
+    <hr />
+    <p class="text-muted" style="text-align:center;">
+      Already have an account?
+      <a href="{{ url_for('login') }}" style="color:var(--accent); text-decoration:none;">
+        Log in here
+      </a>
+    </p>
+
+  </div>
+</div>
+{% endblock %}

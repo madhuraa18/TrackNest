@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Add Item — QR Tracker{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  <div class="page-header">
+    <h1>Add New Item</h1>
+    <p>Give your item a name. A unique QR code will be generated automatically.</p>
+  </div>
+
+  <div class="card" style="max-width:480px;">
+
+    <form method="POST" action="{{ url_for('add_item') }}">
+
+      <div class="form-group">
+        <label for="name">Item Name</label>
+        <input type="text" id="name" name="name"
+               placeholder="e.g. Wallet, Keys, Laptop…"
+               required autofocus />
+      </div>
+
+      <!-- Quick suggestion buttons -->
+      <div class="text-muted mb-4" style="margin-top:-.5rem; font-size:.85rem;">
+        Quick add:
+        {% for suggestion in ['Wallet', 'Keys', 'Laptop', 'Charger', 'Bag', 'Headphones'] %}
+          <button type="button"
+                  onclick="document.getElementById('name').value='{{ suggestion }}'"
+                  style="background:var(--border); border:none; color:var(--text);
+                         padding:.2rem .6rem; border-radius:6px; cursor:pointer;
+                         font-size:.8rem; margin:.15rem;">
+            {{ suggestion }}
+          </button>
+        {% endfor %}
+      </div>
+
+      <div style="display:flex; gap:.75rem;">
+        <button type="submit" class="btn btn-primary">Generate QR & Save</button>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Info box -->
+  <div class="card mt-4" style="max-width:480px; background:#00e5ff08; border-color:#00e5ff30;">
+    <div style="font-weight:700; margin-bottom:.5rem;">ℹ️ How it works</div>
+    <ol style="padding-left:1.2rem; color:var(--muted); font-size:.875rem; line-height:1.8;">
+      <li>Enter a name for your item.</li>
+      <li>A unique QR ID (like <span class="mono">ITEM001</span>) will be assigned.</li>
+      <li>A QR code image is saved automatically.</li>
+      <li>Print or show the QR on your phone, then attach it to the physical item.</li>
+    </ol>
+  </div>
+
+</div>
+{% endblock %}
